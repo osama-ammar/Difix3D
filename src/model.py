@@ -137,6 +137,13 @@ class Difix(torch.nn.Module):
 
         unet = UNet2DConditionModel.from_pretrained("stabilityai/sd-turbo", subfolder="unet")
 
+        ##################################################
+        # enable gradient checkpointing
+        # unet.enable_xformers_memory_efficient_attention()
+        # unet.enable_gradient_checkpointing()
+        # vae.enable_gradient_checkpointing()
+        ###############################################################################
+
         if pretrained_path is not None:
             sd = torch.load(pretrained_path, map_location="cpu")
             vae_lora_config = LoraConfig(r=sd["rank_vae"], init_lora_weights="gaussian", target_modules=sd["vae_lora_target_modules"])

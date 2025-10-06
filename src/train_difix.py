@@ -17,6 +17,7 @@ from torchvision import transforms
 from tqdm.auto import tqdm
 from glob import glob
 from einops import rearrange
+from bitsandbytes.optim import AdamW8bit
 
 import diffusers
 from diffusers.utils.import_utils import is_xformers_available
@@ -93,6 +94,14 @@ def main(args):
     optimizer = torch.optim.AdamW(layers_to_opt, lr=args.learning_rate,
         betas=(args.adam_beta1, args.adam_beta2), weight_decay=args.adam_weight_decay,
         eps=args.adam_epsilon,)
+    
+    # optimizer = AdamW8bit(
+    #     layers_to_opt,
+    #     lr=args.learning_rate,
+    #     betas=(args.adam_beta1, args.adam_beta2),
+    #     weight_decay=args.adam_weight_decay,
+    #     eps=args.adam_epsilon,
+    # )
     lr_scheduler = get_scheduler(args.lr_scheduler, optimizer=optimizer,
         num_warmup_steps=args.lr_warmup_steps * accelerator.num_processes,
         num_training_steps=args.max_train_steps * accelerator.num_processes,
@@ -101,8 +110,14 @@ def main(args):
     dataset_train = PairedDataset(dataset_path=args.dataset_path, split="train", tokenizer=net_difix.tokenizer)
     dl_train = torch.utils.data.DataLoader(dataset_train, batch_size=args.train_batch_size, shuffle=True, num_workers=args.dataloader_num_workers)
     dataset_val = PairedDataset(dataset_path=args.dataset_path, split="test", tokenizer=net_difix.tokenizer)
-    random.Random(42).shuffle(dataset_val.img_names)
+    random.Random(42).shuffle(dataset_val.img_ids)
     dl_val = torch.utils.data.DataLoader(dataset_val, batch_size=1, shuffle=False, num_workers=0)
+
+    n_train_samples = len(dataset_train)
+    n_val_samples = len(dataset_val)
+
+    print(f"Train samples: {n_train_samples}")
+    print(f"Validation samples: {n_val_samples}")
 
     # Resume from checkpoint
     global_step = 0    
