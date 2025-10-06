@@ -1,6 +1,8 @@
 
 # results
 outputs/
-
+train/
 # cache
 *.pyc
+
+#
