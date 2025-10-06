@@ -1,0 +1,6 @@
+
+# results
+outputs/
+
+# cache
+*.pyc
