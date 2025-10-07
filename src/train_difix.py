@@ -56,6 +56,7 @@ def main(args):
         timestep=args.timestep,
         mv_unet=args.mv_unet,
     )
+
     net_difix.set_train()
 
     if args.enable_xformers_memory_efficient_attention:

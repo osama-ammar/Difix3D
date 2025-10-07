@@ -16,22 +16,25 @@ set -u  # error on undefined variable
 
 
 # -------------- Configurable parameters --------------
-DATA_JSON="/home/osama/datasets/diffix_dataset_sample/nersemble_dataset.json"
-# DATA_JSON="/home/osama/datasets/diffix_dataset_sample/ava_dataset.json"
-OUTPUT_DIR="./outputs/difix/train"
-MAX_STEPS=100
+# DATA_JSON="/home/osama/datasets/diffix_dataset_sample/nersemble_dataset.json"
+DATA_JSON="/home/osama/datasets/diffix_dataset_sample/ava_dataset.json"
+OUTPUT_DIR="./outputs/difix/test"
+MAX_STEPS=1
 RESOLUTION=512
 LR=2e-5
 BATCH_SIZE=1
 DATALOADER_WORKERS=8
-CHECKPOINT_STEPS=50
-EVAL_FREQ=20
-VIZ_FREQ=20
+CHECKPOINT_STEPS=100
+EVAL_FREQ=1
+VIZ_FREQ=1
 PROMPT="remove degradation"
 TRACKER="wandb"
 PROJECT_NAME="difix"
-RUN_NAME="on nersemble_dataset sample "
+RUN_NAME="validate on AVA_dataset "
 TIMESTEP=199
+MODEL_NAME="difix_nersemble"
+MODEL_PATH="/home/osama/Difix3D/outputs/difix/train/checkpoints/model_1101.pkl"
+
 
 
 export CUDA_VISIBLE_DEVICES=4
@@ -69,5 +72,11 @@ accelerate launch   --dynamo_backend=inductor  --mixed_precision=bf16 \
     --gradient_checkpointing \
     --gradient_accumulation_steps 4 \
     --num_training_epochs 4 \
+    --revision "${MODEL_NAME}" \
+    --resume  "${MODEL_PATH}" \
+
+    # --variant="${MODEL_NAME}" \
+    # --pretrained_model_name_or_path  "${MODEL_PATH}" \
+
 
 echo "Training finished."

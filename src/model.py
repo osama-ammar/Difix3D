@@ -145,6 +145,7 @@ class Difix(torch.nn.Module):
         ###############################################################################
 
         if pretrained_path is not None:
+            print(f"using pretrained weights  : {pretrained_path}")
             sd = torch.load(pretrained_path, map_location="cpu")
             vae_lora_config = LoraConfig(r=sd["rank_vae"], init_lora_weights="gaussian", target_modules=sd["vae_lora_target_modules"])
             vae.add_adapter(vae_lora_config, adapter_name="vae_skip")
